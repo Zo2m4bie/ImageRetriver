@@ -1,16 +1,11 @@
 package com.image.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.util.Log;
-
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,35 +40,18 @@ public class BitmapUtils {
     public static Bitmap getRotatedBitmap(Uri selectedImage) {
         Bitmap adjustedBitmap = null;
         try {
-            //without OpenCV
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
             ExifInterface exif = new ExifInterface(selectedImage.getPath());
             int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             int rotationInDegrees = exifToDegrees(rotation);
             if(rotationInDegrees != 0) {
                 rotationInDegrees = 360 - rotationInDegrees;
-                /*Without OpenCV
-                 Bitmap originalBitmap = BitmapFactory.decodeFile(selectedImage.getPath(), options);
+                Bitmap originalBitmap = BitmapFactory.decodeFile(selectedImage.getPath(), options);
                 Matrix matrix = configureMatrix(rotation, rotationInDegrees);
                 adjustedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.getWidth(),
                         originalBitmap.getHeight(), matrix, true);
                 originalBitmap.recycle();
-                */
-
-                Mat cvImage = Highgui.imread(selectedImage.getPath());
-                Mat dst = new Mat();
-                Size src_sz = cvImage.size();
-                Size dst_sz = (rotationInDegrees == 90 || rotationInDegrees == 270) ? new Size(src_sz.height, src_sz.width)
-                        : new Size(src_sz.width, src_sz.height);
-                int len = (rotationInDegrees == 270) ? Math.min(cvImage.cols(), cvImage.rows()) : Math.max(cvImage.cols(), cvImage.rows());
-
-//                int len = Math.min(cvImage.cols(), cvImage.rows());
-                Point center =  (rotationInDegrees == 90 || rotationInDegrees == 270) ? new Point(len/2., len/2.)
-                        : new Point(cvImage.cols() / 2, cvImage.rows() / 2);
-                Mat rot_mat = Imgproc.getRotationMatrix2D(center, rotationInDegrees, 1.0);
-                Imgproc.warpAffine(cvImage, dst, rot_mat, dst_sz);
-                Highgui.imwrite(selectedImage.getPath()+ ".jpg", dst);
                 new File(selectedImage.getPath()+ ".jpg").renameTo(new File(selectedImage.getPath()));
             }
         } catch (IOException e) {
