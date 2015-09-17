@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="sdcard_unavailable">SC Card isn\'t available</string>
+    <string name="msg_cant_attach_image">We can\'t attach Image</string>
+
+    <string-array name="cam_gal_items">
+        <item>Camera</item>
+        <item>Gallery</item>
+    </string-array>
+</resources>
